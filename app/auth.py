@@ -30,6 +30,22 @@ def load_user(user_id):
         return User(user)
     return None
 
+@bp.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    hashed_password = generate_password_hash(data['password'])
+
+    try:
+        user_id = user_repo.create(
+            username=data['username'],
+            email=data['email'],
+            password=hashed_password,
+            avatar=data.get('avatar'),
+            roles_id=data.get('roles_id', 2)
+        )
+        return jsonify({"message": "User created", "id": user_id}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @bp.route('/login', methods=['POST'])
 def login():
